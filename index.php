@@ -11,7 +11,38 @@ $stickers = ['monkey.svg', 'random.svg'];
     <meta charset="UTF-8">
     <title>Cup Customizer</title>
     <style>
-        body {
+              .main-file-box {
+                display: flex;
+                gap: 20px;
+                width: 70%;
+                max-width: 70%;
+            }
+                  .imgix-baseurl {
+                border: 1.9px solid #767474;
+                padding: 8px;
+            }
+             .right-sample-image {
+                padding-top: 14px;
+            }
+                  .right-sample-image h3.sample-image {
+                font-weight: 100;
+                font-size: 22px;
+            }
+                  .right_section h3.cup-color {
+                margin: 0px 0px 16px;
+                font-weight: 100;
+                font-size: 22px;
+            }
+            .preview.center_view {
+                width: 100%;
+                border: 2px solid #00000078;
+            }
+            .right_section {
+                width: 100%;
+                 border: 2px solid #00000078;
+                padding: 20px;
+            }
+            body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
@@ -60,75 +91,96 @@ $stickers = ['monkey.svg', 'random.svg'];
         .active {
             border-color: #333;
         }
+      .color-circle.active {
+    border: 2px solid #333;
+}
+.sticker-option.active {
+    border: 2px solid #333;
+}
+
     </style>
 </head>
 <body>
-
-<!-- LEFT: Cup Options -->
-<div class="sidebar">
-    <h3>Select Cup</h3>
-    <?php foreach ($cups as $cupOption): ?>
-        <img src="<?= $imgixBaseUrl . $cupOption ?>" alt="<?= $cupOption ?>" class="cup-option" data-cup="<?= $cupOption ?>">
-    <?php endforeach; ?>
-</div>
-
-<!-- CENTER: Preview -->
-<div class="preview">
-    <h3>Preview</h3>
-    <img class="cup-image" id="cup-preview" src="<?= $imgixBaseUrl . $cups[0] ?>" alt="Cup">
-    <img class="sticker-overlay" id="sticker-preview" src="" alt="Sticker" style="display: none;">
-</div>
-
-<!-- RIGHT: Sticker Options -->
-<div class="stickers">
-    <h3>Select Sticker</h3>
-    <?php foreach ($stickers as $stickerOption): ?>
-        <img src="<?= $imgixBaseUrl . 'stickers/' . $stickerOption ?>" alt="<?= $stickerOption ?>" class="sticker-option" data-sticker="<?= $stickerOption ?>">
-    <?php endforeach; ?>
-</div>
-
-<script>
-    // Function to update the preview without reloading the page
-    function updatePreview(cup, sticker) {
-        // Update cup image
-        document.getElementById('cup-preview').src = 'https://kaswebtechsolutions.com/imgix-test/uploads/' + cup;
-        // If a sticker is selected, display it; otherwise, hide it
-        if (sticker) {
-            document.getElementById('sticker-preview').src = 'https://kaswebtechsolutions.com/imgix-test/uploads/stickers/' + sticker;
-            document.getElementById('sticker-preview').style.display = 'block';
-        } else {
-            document.getElementById('sticker-preview').style.display = 'none';
-        }
+<div style="width: 100%; display: flex; justify-content: center; align-items: flex-start; gap: 60px; padding: 40px; font-family: Arial, sans-serif;">
+<div class="main-file-box">
+        <!-- CENTER: Preview -->
+        <div class="preview center_view" style="text-align: center; position: relative;">
+            <h3>Preview</h3>
+            <img class="cup-image" id="cup-preview" src="<?= $imgixBaseUrl . $cups[0] ?>" alt="Cup" style="width: 300px;">
+            <img class="sticker-overlay" id="sticker-preview" src="" alt="Sticker" style="display: none; position: absolute; top: 50%; left: 50%; width: 100px; transform: translate(-50%, -50%); pointer-events: none;">
+        </div>
+		
+      <div class="right_section">
+         <!-- LEFT: Cup Colors as Circles -->
+        <div>
+            <h3 class="cup-color">Cup Color</h3>
+            <div style="display: flex; gap: 12px;">
+                <?php foreach ($cups as $cupOption): 
+                    $color = strtolower(pathinfo($cupOption, PATHINFO_FILENAME));
+                    $colorCode = match($color) {
+                        'purple' => '#343a96',
+                        'green' => '#2e6e43',
+                        'silver' => '#c0c0c0',
+                        default => '#ccc'
+                    };
+                ?>
+                    <div class="color-circle" data-cup="<?= $cupOption ?>" title="<?= ucfirst($color) ?>" style="width: 30px; height: 30px; border-radius: 50%; background: <?= $colorCode ?>; cursor: pointer; border: 2px solid transparent;"></div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <!-- RIGHT: Sample Images (Stickers) -->
+        <div class="right-sample-image">
+            <h3 class="sample-image">Sample Images</h3>
+            <div class="imgix-option-image" style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <?php foreach ($stickers as $stickerOption): ?>
+              <div class="imgix-baseurl">
+                    <img src="<?= $imgixBaseUrl . 'stickers/' . $stickerOption ?>" alt="<?= $stickerOption ?>" class="sticker-option" data-sticker="<?= $stickerOption ?>" 
+                         style="width: 100px; cursor: pointer; border: 2px solid transparent;">
+              </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+  </div>
+  </div>
+    <script>
+        function updatePreview(cup, sticker) {
+    document.getElementById('cup-preview').src = '<?= $imgixBaseUrl ?>' + cup;
+    if (sticker) {
+        document.getElementById('sticker-preview').src = '<?= $imgixBaseUrl ?>stickers/' + sticker;
+        document.getElementById('sticker-preview').style.display = 'block';
+    } else {
+        document.getElementById('sticker-preview').style.display = 'none';
     }
+}
 
-    // Event listeners for cup selection
-    document.querySelectorAll('.cup-option').forEach(function (img) {
-        img.addEventListener('click', function () {
-            const cup = this.getAttribute('data-cup');
-            const sticker = document.querySelector('.sticker-option.active') ? document.querySelector('.sticker-option.active').getAttribute('data-sticker') : ''; 
-            updatePreview(cup, sticker);
+// Handle cup selection
+document.querySelectorAll('.color-circle').forEach(function (circle) {
+    circle.addEventListener('click', function () {
+        const cup = this.getAttribute('data-cup');
+        const activeSticker = document.querySelector('.sticker-option.active');
+        const sticker = activeSticker ? activeSticker.getAttribute('data-sticker') : '';
+        updatePreview(cup, sticker);
 
-          document.querySelectorAll('.cup-option').forEach(function (item) {
-                item.classList.remove('active');
-            });
-            this.classList.add('active');
-        });
+        // Remove .active from all cups
+        document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('active'));
+        // Add .active to current cup
+        this.classList.add('active');
     });
+});
 
-    // Event listeners for sticker selection
-    document.querySelectorAll('.sticker-option').forEach(function (img) {
-        img.addEventListener('click', function () {
-            const sticker = this.getAttribute('data-sticker');
-            const cup = document.querySelector('.cup-option.active') ? document.querySelector('.cup-option.active').getAttribute('data-cup') : 'Purple.png';
-            updatePreview(cup, sticker);
+// Handle sticker selection
+document.querySelectorAll('.sticker-option').forEach(function (img) {
+    img.addEventListener('click', function () {
+        const sticker = this.getAttribute('data-sticker');
+        const activeCup = document.querySelector('.color-circle.active');
+        const cup = activeCup ? activeCup.getAttribute('data-cup') : 'Purple.png';
+        updatePreview(cup, sticker);
 
-            // Set the active state for stickers
-            document.querySelectorAll('.sticker-option').forEach(function (item) {
-                item.classList.remove('active');
-            });
-            this.classList.add('active');
-        });
+        document.querySelectorAll('.sticker-option').forEach(el => el.classList.remove('active'));
+        this.classList.add('active');
     });
+});
 </script>
 </body>
 </html>
