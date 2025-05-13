@@ -1,48 +1,15 @@
 <?php
-
-$imgixBaseUrl = 'https://kaswebtechsolutions.com/imgix-test/uploads/';
-// Sample cup and sticker files
+$imgixBaseUrl = 'https://kas-webtech-71.imgix.net/uploads/';
 $cups = ['Purple.png', 'Green.png', 'Silver.png'];
-$stickers = ['monkey.svg', 'random.svg'];
+$stickers = ['lion.jpg', 'monkey.jpg'];
 ?>
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Cup Customizer</title>
+    <title>Cup Customizer (with Imgix Blend)</title>
     <style>
-              .main-file-box {
-                display: flex;
-                gap: 20px;
-                width: 70%;
-                max-width: 70%;
-            }
-                  .imgix-baseurl {
-                border: 1.9px solid #767474;
-                padding: 8px;
-            }
-             .right-sample-image {
-                padding-top: 14px;
-            }
-                  .right-sample-image h3.sample-image {
-                font-weight: 100;
-                font-size: 22px;
-            }
-                  .right_section h3.cup-color {
-                margin: 0px 0px 16px;
-                font-weight: 100;
-                font-size: 22px;
-            }
-            .preview.center_view {
-                width: 100%;
-                border: 2px solid #00000078;
-            }
-            .right_section {
-                width: 100%;
-                 border: 2px solid #00000078;
-                padding: 20px;
-            }
-            body {
+        body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
@@ -52,25 +19,19 @@ $stickers = ['monkey.svg', 'random.svg'];
             background-color: #f9f9f9;
         }
 
-        .sidebar, .stickers {
+        .main-file-box {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .sidebar img, .stickers img {
-            width: 100px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: border-color 0.2s;
-        }
-        .sidebar img:hover, .stickers img:hover {
-            border-color: #333;
+            gap: 20px;
+            width: 70%;
+            max-width: 70%;
         }
 
         .preview {
             width: 50%;
             text-align: center;
             position: relative;
+            border: 2px solid #00000078;
+            padding: 10px;
         }
 
         .cup-image {
@@ -78,109 +39,128 @@ $stickers = ['monkey.svg', 'random.svg'];
             max-width: 300px;
         }
 
-        .sticker-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 151px;
-            height: 80px;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
+        .right_section {
+            width: 100%;
+            border: 2px solid #00000078;
+            padding: 20px;
         }
 
-        .active {
-            border-color: #333;
+        .color-circle, .sticker-option {
+            cursor: pointer;
+            border: 2px solid transparent;
         }
-      .color-circle.active {
-    border: 2px solid #333;
-}
-.sticker-option.active {
-    border: 2px solid #333;
-}
 
+        .color-circle.active, .sticker-option.active {
+            border: 2px solid #333;
+        }
+
+        .color-circle {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+        }
+
+        .right-sample-image img {
+            width: 100px;
+        }
+
+        .imgix-baseurl {
+            border: 1.9px solid #767474;
+            padding: 8px;
+        }
     </style>
 </head>
 <body>
-<div style="width: 100%; display: flex; justify-content: center; align-items: flex-start; gap: 60px; padding: 40px; font-family: Arial, sans-serif;">
 <div class="main-file-box">
-        <!-- CENTER: Preview -->
-        <div class="preview center_view" style="text-align: center; position: relative;">
-            <h3>Preview</h3>
-            <img class="cup-image" id="cup-preview" src="<?= $imgixBaseUrl . $cups[0] ?>" alt="Cup" style="width: 300px;">
-            <img class="sticker-overlay" id="sticker-preview" src="" alt="Sticker" style="display: none; position: absolute; top: 50%; left: 50%; width: 100px; transform: translate(-50%, -50%); pointer-events: none;">
+    <!-- Preview Section -->
+    <div class="preview">
+        <h3>Preview</h3>
+        <img class="cup-image" id="cup-preview" src="<?= $imgixBaseUrl . $cups[0] ?>" alt="Cup with Sticker">
+    </div>
+
+    <!-- Controls -->
+    <div class="right_section">
+        <h3 class="cup-color">Cup Color</h3>
+        <div style="display: flex; gap: 12px;">
+            <?php foreach ($cups as $cupOption):
+                $color = strtolower(pathinfo($cupOption, PATHINFO_FILENAME));
+                $colorCode = match($color) {
+                    'purple' => '#343a96',
+                    'green' => '#2e6e43',
+                    'silver' => '#c0c0c0',
+                    default => '#ccc'
+                };
+            ?>
+                <div class="color-circle" data-cup="<?= $cupOption ?>" style="background: <?= $colorCode ?>;" title="<?= ucfirst($color) ?>"></div>
+            <?php endforeach; ?>
         </div>
-		
-      <div class="right_section">
-         <!-- LEFT: Cup Colors as Circles -->
-        <div>
-            <h3 class="cup-color">Cup Color</h3>
-            <div style="display: flex; gap: 12px;">
-                <?php foreach ($cups as $cupOption): 
-                    $color = strtolower(pathinfo($cupOption, PATHINFO_FILENAME));
-                    $colorCode = match($color) {
-                        'purple' => '#343a96',
-                        'green' => '#2e6e43',
-                        'silver' => '#c0c0c0',
-                        default => '#ccc'
-                    };
-                ?>
-                    <div class="color-circle" data-cup="<?= $cupOption ?>" title="<?= ucfirst($color) ?>" style="width: 30px; height: 30px; border-radius: 50%; background: <?= $colorCode ?>; cursor: pointer; border: 2px solid transparent;"></div>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <!-- RIGHT: Sample Images (Stickers) -->
-        <div class="right-sample-image">
-            <h3 class="sample-image">Sample Images</h3>
-            <div class="imgix-option-image" style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <?php foreach ($stickers as $stickerOption): ?>
-              <div class="imgix-baseurl">
-                    <img src="<?= $imgixBaseUrl . 'stickers/' . $stickerOption ?>" alt="<?= $stickerOption ?>" class="sticker-option" data-sticker="<?= $stickerOption ?>" 
-                         style="width: 100px; cursor: pointer; border: 2px solid transparent;">
-              </div>
+
+        <div class="right-sample-image" style="margin-top: 20px;">
+            <h3 class="sample-image">Sample Stickers</h3>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <?php foreach ($stickers as $sticker): ?>
+                    <div class="imgix-baseurl">
+                        <img src="<?= $imgixBaseUrl . 'stickers/' . $sticker ?>" class="sticker-option" data-sticker="<?= $sticker ?>" alt="<?= $sticker ?>">
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
     </div>
-  </div>
-  </div>
-    <script>
-        function updatePreview(cup, sticker) {
-    document.getElementById('cup-preview').src = '<?= $imgixBaseUrl ?>' + cup;
-    if (sticker) {
-        document.getElementById('sticker-preview').src = '<?= $imgixBaseUrl ?>stickers/' + sticker;
-        document.getElementById('sticker-preview').style.display = 'block';
-    } else {
-        document.getElementById('sticker-preview').style.display = 'none';
+</div>
+
+<script>
+    const imgixBase = '<?= $imgixBaseUrl ?>';
+
+    function updatePreview(cup, sticker) {
+        const cupUrl = imgixBase + cup;
+        let finalUrl = cupUrl;
+
+        if (sticker) {
+            const blendParams = new URLSearchParams({
+                blend: imgixBase + 'stickers/' + sticker,
+                'blend-mode': 'normal',
+                'blend-align': 'middle,center',
+                'blend-width': 120,
+                'blend-height': 80,
+                'blend-alpha': 100
+            });
+            finalUrl += '?' + blendParams.toString();
+        }
+
+        document.getElementById('cup-preview').src = finalUrl;
     }
-}
 
-// Handle cup selection
-document.querySelectorAll('.color-circle').forEach(function (circle) {
-    circle.addEventListener('click', function () {
-        const cup = this.getAttribute('data-cup');
-        const activeSticker = document.querySelector('.sticker-option.active');
-        const sticker = activeSticker ? activeSticker.getAttribute('data-sticker') : '';
-        updatePreview(cup, sticker);
+    // Cup selection
+    document.querySelectorAll('.color-circle').forEach(circle => {
+        circle.addEventListener('click', () => {
+            const cup = circle.dataset.cup;
+            const activeSticker = document.querySelector('.sticker-option.active');
+            const sticker = activeSticker ? activeSticker.dataset.sticker : '';
 
-        // Remove .active from all cups
-        document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('active'));
-        // Add .active to current cup
-        this.classList.add('active');
+            updatePreview(cup, sticker);
+
+            document.querySelectorAll('.color-circle').forEach(el => el.classList.remove('active'));
+            circle.classList.add('active');
+        });
     });
-});
 
-// Handle sticker selection
-document.querySelectorAll('.sticker-option').forEach(function (img) {
-    img.addEventListener('click', function () {
-        const sticker = this.getAttribute('data-sticker');
-        const activeCup = document.querySelector('.color-circle.active');
-        const cup = activeCup ? activeCup.getAttribute('data-cup') : 'Purple.png';
-        updatePreview(cup, sticker);
+    // Sticker selection
+    document.querySelectorAll('.sticker-option').forEach(stickerEl => {
+        stickerEl.addEventListener('click', () => {
+            const sticker = stickerEl.dataset.sticker;
+            const activeCup = document.querySelector('.color-circle.active');
+            const cup = activeCup ? activeCup.dataset.cup : 'Purple.png';
 
-        document.querySelectorAll('.sticker-option').forEach(el => el.classList.remove('active'));
-        this.classList.add('active');
+            updatePreview(cup, sticker);
+
+            document.querySelectorAll('.sticker-option').forEach(el => el.classList.remove('active'));
+            stickerEl.classList.add('active');
+        });
     });
-});
+
+    // Initial load
+    document.querySelector('.color-circle').classList.add('active');
+    updatePreview('<?= $cups[0] ?>', '');
 </script>
 </body>
 </html>
