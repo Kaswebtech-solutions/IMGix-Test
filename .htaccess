@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteBase /imgix-test/
+
+# Allow accessing index.php as /customizer (or /index)
+RewriteRule ^customizer$ index.php [L]
+
+# Remove .php extension from all .php files
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([a-zA-Z0-9_-]+)$ $1.php [L]
